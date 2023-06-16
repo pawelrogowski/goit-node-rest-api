@@ -11,7 +11,6 @@ const router = express.Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
-router.patch("/:id/subscription", updateSubscription);
 router.get("/logout", authMiddleware, logout);
 router.get("/current", authMiddleware, getCurrentUser);
 

@@ -68,32 +68,6 @@ const usersController = {
       next(error);
     }
   },
-  updateSubscription: async (req, res, next) => {
-    try {
-      const { subscription } = req.body;
-
-      if (
-        !subscription ||
-        !["starter", "pro", "business"].includes(subscription)
-      ) {
-        return res.status(400).json({ message: "Invalid subscription value" });
-      }
-
-      const user = await User.findByIdAndUpdate(
-        req.params.id,
-        { subscription },
-        { new: true }
-      );
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      res.json({ user });
-    } catch (error) {
-      next(error);
-    }
-  },
   logout: async (req, res, next) => {
     try {
       req.user.token = null;

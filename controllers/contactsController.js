@@ -27,7 +27,8 @@ const contactsController = {
 
   getFavoriteContacts: async (req, res, next) => {
     try {
-      const contacts = await contactsService.getFavoriteContacts(req.user._id);
+      const owner = req.user._id;
+      const contacts = await contactsService.getFavoriteContacts(owner);
       res.json(contacts);
     } catch (error) {
       next(error);
@@ -84,7 +85,7 @@ const contactsController = {
     }
     try {
       const updatedContact = await contactsService.toggleFavorite(
-        req.params.contactId,
+        req.params.id,
         favorite,
         req.user._id
       );

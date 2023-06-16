@@ -40,9 +40,9 @@ const contactsService = {
     );
   },
 
-  toggleFavorite: (contactId, favorite, owner) => {
+  toggleFavorite: (id, favorite, owner) => {
     return Contact.findOneAndUpdate(
-      { _id: contactId, owner },
+      { _id: id, owner },
       { $set: { favorite } },
       { new: true }
     );

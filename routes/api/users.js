@@ -2,7 +2,6 @@ const express = require("express");
 const {
   signup,
   login,
-  updateSubscription,
   logout,
   getCurrentUser,
 } = require("../../controllers/usersController");

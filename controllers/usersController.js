@@ -1,11 +1,13 @@
-require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 const {
   validateRegistration,
   validateLogin,
 } = require("../validators/usersValidator");
+const usersService = require("../services/usersService");
 const User = require("../models/userModel");
+const path = require("path");
 
 const usersController = {
   signup: async (req, res, next) => {
@@ -29,6 +31,11 @@ const usersController = {
         email,
         password: hashedPassword,
         subscription: "starter",
+        avatarURL: gravatar.url(email, {
+          protocol: "http",
+          s: "250",
+          r: "pg",
+        }),
       };
 
       const createdUser = await User.create(newUser);
@@ -84,6 +91,27 @@ const usersController = {
         email: user.email,
         subscription: user.subscription,
       });
+    } catch (error) {
+      next(error);
+    }
+  },
+  updateAvatar: async (req, res, next) => {
+    try {
+      const { user } = req;
+      const avatar = req.file;
+
+      if (!user) {
+        return res.status(401).json({ message: "Not authorized" });
+      }
+
+      const avatarFilename = `${user._id}${path.extname(avatar.originalname)}`;
+
+      await usersService.processAvatar(avatar, avatarFilename);
+
+      user.avatarURL = `/avatars/${avatarFilename}`;
+      await user.save();
+
+      res.json({ avatarURL: user.avatarURL });
     } catch (error) {
       next(error);
     }

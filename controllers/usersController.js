@@ -7,6 +7,7 @@ const {
 } = require("../validators/usersValidator");
 const usersService = require("../services/usersService");
 const User = require("../models/userModel");
+const fs = require("fs");
 const path = require("path");
 
 const usersController = {
@@ -105,6 +106,11 @@ const usersController = {
       }
 
       const avatarFilename = `${user._id}${path.extname(avatar.originalname)}`;
+      const avatarDirectory = "./public/avatars";
+
+      if (!fs.existsSync(avatarDirectory)) {
+        fs.mkdirSync(avatarDirectory, { recursive: true });
+      }
 
       await usersService.processAvatar(avatar, avatarFilename);
 

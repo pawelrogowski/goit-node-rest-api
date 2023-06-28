@@ -4,11 +4,19 @@ const gravatar = require("gravatar");
 const {
   validateRegistration,
   validateLogin,
+  validateEmail,
 } = require("../validators/usersValidator");
 const usersService = require("../services/usersService");
 const User = require("../models/userModel");
 const fs = require("fs");
 const path = require("path");
+
+const { v4: uuidv4 } = require("uuid");
+
+function generateVerificationToken() {
+  const token = uuidv4();
+  return token;
+}
 
 const usersController = {
   signup: async (req, res, next) => {
@@ -37,9 +45,16 @@ const usersController = {
           s: "250",
           r: "pg",
         }),
+        verify: false,
+        verificationToken: generateVerificationToken(),
       };
 
       const createdUser = await User.create(newUser);
+
+      await usersService.sendVerificationLink(
+        createdUser.email,
+        createdUser.verificationToken
+      );
 
       res.status(201).json({ user: createdUser });
     } catch (error) {
@@ -118,6 +133,62 @@ const usersController = {
       await user.save();
 
       res.json({ avatarURL: user.avatarURL });
+    } catch (error) {
+      next(error);
+    }
+  },
+  verifyEmail: async (req, res, next) => {
+    try {
+      const { verificationToken } = req.params;
+      console.log(verificationToken);
+      const user = await User.findOne({ verificationToken });
+      console.log(user);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.verify) {
+        return res
+          .status(400)
+          .json({ message: "Verification has already been passed" });
+      }
+
+      user.verificationToken = "null";
+      user.verify = true;
+      await user.save();
+
+      res.status(200).json({ message: "Verification successful" });
+    } catch (error) {
+      next(error);
+    }
+  },
+  resendVerificationEmail: async (req, res, next) => {
+    try {
+      const { email } = req.body;
+
+      const { error } = validateEmail(req.body);
+      if (error) {
+        return res.status(400).json({ message: error.details[0].message });
+      }
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      if (user.verify) {
+        return res
+          .status(400)
+          .json({ message: "Verification has already been passed" });
+      }
+
+      const verificationToken = generateVerificationToken();
+      user.verificationToken = verificationToken;
+      await user.save();
+
+      await usersService.sendVerificationLink(email, verificationToken);
+
+      res.status(200).json({ message: "Verification email sent" });
     } catch (error) {
       next(error);
     }

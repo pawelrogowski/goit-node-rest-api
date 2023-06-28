@@ -1,6 +1,8 @@
 const app = require("./app");
 const mongoose = require("mongoose");
 
+const Port = process.env.APP_PORT || 3000;
+
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -23,6 +25,6 @@ process.on("exit", function (code) {
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server running. Use our API on port: 3000");
+app.listen(Port, () => {
+  console.log(`Server running. Use our API on port: ${Port}`);
 });

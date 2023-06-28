@@ -42,7 +42,9 @@ const usersService = {
   },
   sendVerificationLink: async (userEmail, userToken) => {
     try {
-      const serverUrl = process.env.BASE_URL || "http://localhost:3000";
+      const serverUrl =
+        `${process.env.BASE_URL}:${process.env.APP_PORT}` ||
+        `http://localhost:${process.env.APP_PORT}`;
       const verificationLink = `${serverUrl}/api/users/verify/${userToken}`;
 
       await User.findOneAndUpdate(
@@ -52,7 +54,7 @@ const usersService = {
       );
 
       const mailOptions = {
-        from: process.env.OUTLOOK_USER,
+        from: process.env.SMTP_USER,
         to: userEmail,
         subject: "Email Verification",
         html: `<p>Click the link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`,
@@ -60,7 +62,6 @@ const usersService = {
 
       const info = await transporter.sendMail(mailOptions);
       console.log("Verification email sent:", info.messageId, info.envelope);
-      return info;
     } catch (err) {
       console.log(err);
       throw err;

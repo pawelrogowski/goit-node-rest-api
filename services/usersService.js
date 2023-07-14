@@ -43,8 +43,8 @@ const usersService = {
   sendVerificationLink: async (userEmail, userToken) => {
     try {
       const serverUrl =
-        `${process.env.BASE_URL}:${process.env.APP_PORT}` ||
-        `http://localhost:${process.env.APP_PORT}`;
+        `${process.env.BASE_URL}:${process.env.PORT}` ||
+        `http://localhost:${process.env.PORT}`;
       const verificationLink = `${serverUrl}/api/users/verify/${userToken}`;
 
       await User.findOneAndUpdate(

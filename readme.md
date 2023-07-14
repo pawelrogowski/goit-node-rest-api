@@ -22,7 +22,7 @@ The API server exposes the following routes:
 <h2>Environment Variables</h2>
 The API server expects the following environment variables to be set:
 
-- **APP_PORT:** The port number on which the server will run (default: 3000).
+- **PORT:** The port number on which the server will run (default: 3000).
 - **BASE_URL:** The base URL of the server (default: http://localhost).
 - **MONGO_URI:** The MongoDB connection URI.
 - **JWT_SECRET:** The secret key used for JWT authentication.
